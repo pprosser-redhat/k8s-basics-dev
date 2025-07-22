@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/01-setup.html</loc>
+<lastmod>2025-07-22T13:21:25.794Z</lastmod>
+</url>
+<url>
+<loc>https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/02-deploy.html</loc>
+<lastmod>2025-07-22T13:21:25.794Z</lastmod>
+</url>
+<url>
+<loc>https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/index.html</loc>
+<lastmod>2025-07-22T13:21:25.794Z</lastmod>
+</url>
+</urlset>

@@ -1,7 +1,0 @@
-name: k8s-start-guides
-title: Kubernetees getting started workshop
-version: master
-nav:
-  - modules/ROOT/nav.adoc
-
-start_page: ROOT:index.adoc
