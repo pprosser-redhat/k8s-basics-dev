@@ -4,6 +4,7 @@ This is to show you how quickly you can deploy a complete application to Kuberne
 
 The first part of the application we want to deploy is the PostgreSQL database. The set of resource files for deploying this can be found in the `database` directory.
 
+[.console-input]
 [source,execute]
 ----
 ls -las database/
@@ -13,6 +14,7 @@ Each file in the directory contains a different resource definition which go tog
 
 Rather than try and dig into each file to work out what it defines, you can have Kubernetes tell you what resources it would create when the directory of resources is processed. To do this, run:
 
+[.console-input]
 [source,execute]
 ----
 kubectl apply -f database/ --dry-run
