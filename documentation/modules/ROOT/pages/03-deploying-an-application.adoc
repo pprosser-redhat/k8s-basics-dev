@@ -4,31 +4,36 @@ This is to show you how quickly you can deploy a complete application to Kuberne
 
 The first part of the application we want to deploy is the PostgreSQL database. The set of resource files for deploying this can be found in the `database` directory.
 
-```execute
+[source,execute]
+----
 ls -las database/
-```
+----
 
 Each file in the directory contains a different resource definition which go together to make up the deployment for the application component.
 
 Rather than try and dig into each file to work out what it defines, you can have Kubernetes tell you what resources it would create when the directory of resources is processed. To do this, run:
 
-```execute
+[source,execute]
+----
 kubectl apply -f database/ --dry-run
-```
+----
 
 This should output:
 
-```
+[source]
+----
 secret/blog-credentials created (dry run)
 service/blog-db created (dry run)
 persistentvolumeclaim/blog-database created (dry run)
 deployment.apps/blog-db created (dry run)
-```
+----
 
-The `kubectl apply` command in this case is what is used to create resources from a configuration file, or set of files contained in a directory. We used the `--dry-run` option, which says to tell us what would be created, but don't actually do it. The `--dry-run` option is useful because it will tell you what resources would be created, but also validates the resource definitions and will warn you if you have errors in them.
+
+The `kubectl apply` command in this case is what is used to create resources from a configuration file, or set of files contained in a directory. We used the `--dry-run=client` option, which says to tell us what would be created, but don't actually do it. The `--dry-run=client` option is useful because it will tell you what resources would be created, but also validates the resource definitions and will warn you if you have errors in them.
 
 If you are ever uncertain about what a command does, or what options it accepts, you can run it with the `--help` option.
 
-```execute
+[source,execute]
+----
 kubectl apply --help
-```
+----

@@ -1,3 +1,5 @@
+Here for reference, will be deleted shortly
+
 = Setup
 include::_attributes.adoc[]
 
