@@ -1,5 +1,5 @@
-name: template-tutorial
-title: Template Tutorial
+name: k8s-start-guides
+title: Kubernetees getting started workshop
 version: master
 nav:
   - modules/ROOT/nav.adoc

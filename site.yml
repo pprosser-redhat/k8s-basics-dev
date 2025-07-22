@@ -4,7 +4,7 @@ runtime:
 site:
   title: Kubernetees getting started workshop
   url: https://pprosser-redhat.github.io/k8s-basics-dev/
-  start_page: template-tutorial::index.adoc
+  start_page: k8s-start-guides::index.adoc
 
 content:
   sources:

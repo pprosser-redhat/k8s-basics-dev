@@ -4,7 +4,7 @@ runtime:
 site:
   title: Kubernetees getting started workshop(Dev Mode)
   url: http://localhost:3000/rhs-build-course/index.html
-  start_page: template-tutorial::index.adoc
+  start_page: k8s-start-guides::index.adoc
 
 content:
   sources:
