@@ -10,6 +10,7 @@ content:
   sources:
     - url: .
       start_path: documentation
+      branches: HEAD
 
 asciidoc:
   attributes:
