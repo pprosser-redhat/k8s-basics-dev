@@ -19,5 +19,5 @@ Getting Started
 [.tile]
 Deploying the Application
 
-* xref:03-deploying-an-application[Deploy the Appliction]
-* xref:04-creating-the-resources[Create the Resources]
+* xref:03-deploying-an-application.adoc[Deploy the Appliction]
+* xref:04-creating-the-resources.adoc[Create the Resources]
