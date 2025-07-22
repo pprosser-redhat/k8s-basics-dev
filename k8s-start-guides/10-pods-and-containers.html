@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Deploy Service :: Kubernetees getting started workshop</title>
-    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/02-deploy.html">
-    <link rel="prev" href="01-setup.html#minikube">
+    <title>Untitled :: Kubernetees getting started workshop</title>
+    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/10-pods-and-containers.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
   </head>
@@ -62,15 +61,15 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#package">Build Service</a>
+    <a class="nav-link" href="02-deploy.html#package">Build Service</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#deploy">Deploy Dervice</a>
+    <a class="nav-link" href="02-deploy.html#deploy">Deploy Dervice</a>
   </li>
 </ul>
   </li>
@@ -87,96 +86,32 @@
 <button class="nav-toggle"></button>
   <a href="index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
-  <ul>
-    <li><a href="index.html">Kubernetees getting started workshop</a></li>
-    <li><a href="02-deploy.html">2. Deploy Service</a></li>
-  </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/02-deploy.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/10-pods-and-containers.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Deploy Service</h1>
-<div class="sect1">
-<h2 id="service"><a class="anchor" href="#service"></a>The Service</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>The code:</p>
-</div>
-<div class="listingblock lines_7 console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Main {
-
-    public static void main(String[] args) {
-
-    }
-
-}
-
-./mvnw compile</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="package"><a class="anchor" href="#package"></a>Packaging the Service</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You can package the next bash script:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/sh
-echo "Hello World"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy the Service</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>And then you can deploy the service and execute commands inside:</p>
+<p>It has already been mentioned that a <code>pod</code> represents an instance of your application.</p>
 </div>
 <div class="paragraph">
-<p>Check that the pod is up and running:</p>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get pods</code></pre>
-</div>
-</div>
-<div class="listingblock console-output">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                        READY   STATUS    RESTARTS   AGE
-apps   1/1     Running   0          5s</code></pre>
-</div>
+<p>To be more precise, a <code>pod</code> is an abstraction which represents a group of running containers, where the containers are to be managed and scaled as a unit.</p>
 </div>
 <div class="paragraph">
-<p>Then let&#8217;s go into the running pod to execute some commands:</p>
+<p>An instance of your application runs in one container of each <code>pod</code> resulting from the deployment. Where there would only be multiple <code>pods</code> if the replica count on the <code>deployment</code> was greater than 1.</p>
 </div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl exec -ti apps /bin/bash</code></pre>
+<div class="paragraph">
+<p>In most cases a <code>pod</code> will consist of only a single container. There are use cases for running multiple containers in one <code>pod</code>, but they are generally the exception rather than the rule.</p>
 </div>
+<div class="paragraph">
+<p>Looking at the sample application being used in this workshop, there are two separate deployments. One for the front end web application, and the other for the database.</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Change the pod name with your pod name.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>They are separated as it allows the front end web application to be scaled up to multiple instances independent of the database. If both components had been created as part of the one deployment, running in separate containers of a <code>pod</code>, it would not be possible to scale the application up to multiple instances. This is because scaling a database isn&#8217;t as simple as increasing the replica count.</p>
 </div>
+<div class="paragraph">
+<p>The sequence of events which results in your application being run is therefore, that the <code>deployment</code> is created, from which a <code>replicaset</code> is created. From the <code>replicaset</code>, <code>pods</code> are created corresponding to the replica count specified in the <code>deployment</code>. For each <code>pod</code> created, a container is run using the container image supplied in the <code>deployment</code>. This is the instance of your application.</p>
 </div>
-</div>
-<nav class="pagination">
-  <span class="prev"><a href="01-setup.html#minikube">Setup Minikube</a></span>
-</nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>

@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Deploy Service :: Kubernetees getting started workshop</title>
-    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/02-deploy.html">
-    <link rel="prev" href="01-setup.html#minikube">
+    <title>Untitled :: Kubernetees getting started workshop</title>
+    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/14-exposing-the-service.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
   </head>
@@ -62,15 +61,15 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#package">Build Service</a>
+    <a class="nav-link" href="02-deploy.html#package">Build Service</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#deploy">Deploy Dervice</a>
+    <a class="nav-link" href="02-deploy.html#deploy">Deploy Dervice</a>
   </li>
 </ul>
   </li>
@@ -87,96 +86,88 @@
 <button class="nav-toggle"></button>
   <a href="index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
-  <ul>
-    <li><a href="index.html">Kubernetees getting started workshop</a></li>
-    <li><a href="02-deploy.html">2. Deploy Service</a></li>
-  </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/02-deploy.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/14-exposing-the-service.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Deploy Service</h1>
-<div class="sect1">
-<h2 id="service"><a class="anchor" href="#service"></a>The Service</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>The code:</p>
+<p>In order to expose a <code>service</code> so that it is accessible outside of the Kubernetes cluster, you need to create an <code>ingress</code> resource object.</p>
 </div>
-<div class="listingblock lines_7 console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Main {
-
-    public static void main(String[] args) {
-
-    }
-
-}
-
-./mvnw compile</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="package"><a class="anchor" href="#package"></a>Packaging the Service</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>You can package the next bash script:</p>
+<p>To see the definition for the <code>ingress</code> resource object we will use run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/sh
-echo "Hello World"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy the Service</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>And then you can deploy the service and execute commands inside:</p>
-</div>
-<div class="paragraph">
-<p>Check that the pod is up and running:</p>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get pods</code></pre>
-</div>
-</div>
-<div class="listingblock console-output">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                        READY   STATUS    RESTARTS   AGE
-apps   1/1     Running   0          5s</code></pre>
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v3/ingress.yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Then let&#8217;s go into the running pod to execute some commands:</p>
+<p>You should see output:</p>
 </div>
-<div class="listingblock console-input">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl exec -ti apps /bin/bash</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  rules:
+  - host: blog-%project_namespace%.%cluster_subdomain%
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: blog
+          servicePort: 8080</code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Change the pod name with your pod name.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>The <code>rules</code> section in the <code>ingress</code> definition is what controls what should happen when traffic for your web application is received by the router for the Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>In this case the rule says that any HTTP requests received for the host <code>blog-%project_namespace%.%cluster_subdomain%</code> should be directed to the application with <code>service</code> object named <code>blog</code>.</p>
+</div>
+<div class="paragraph">
+<p>When an external user accesses the host name from their web browser, they will use the standard port 80 for HTTP traffic, the router will pass through that traffic to port 8080 of the <code>service</code>.</p>
+</div>
+<div class="paragraph">
+<p>To update the configuration for the front end web application to add the <code>ingress</code> run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v3/</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>This should output:</p>
 </div>
-<nav class="pagination">
-  <span class="prev"><a href="01-setup.html#minikube">Setup Minikube</a></span>
-</nav>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog configured
+ingress.extensions/blog created
+service/blog unchanged</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can review the <code>ingress</code> resource which was created by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get ingress -l app=blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that the <code>ingress</code> has been created, you can access the front end web application using a web browser at:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://blog-%project_namespace%.%cluster_subdomain%" class="bare">http://blog-%project_namespace%.%cluster_subdomain%</a></p>
+</div>
+<div class="paragraph">
+<p>Note that this works because a wildcard CNAME has already been pre-configured in an external domain name server (DNS) to direct traffic for this host to the router for the Kubernetes cluster. If this was your own Kubernetes cluster, you would need to configure an appropriate CNAME in the DNS for the host you want to use.</p>
+</div>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Kubernetees getting started workshop</title>
+    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/17-persistent-volumes.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="https://pprosser-redhat.github.io/k8s-basics-dev">Kubernetees getting started workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://developers.redhat.com/ebooks/" target="_blank">Books</a>
+        <a class="navbar-item" href="https://developers.redhat.com/cheatsheets/" target="_blank">Cheat Sheets</a>
+        <a class="navbar-item" href="https://developers.redhat.com/events/" target="_blank">Upcoming Events</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/kubernetes-tutorial/" target="_blank">Kubernetes</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/istio-tutorial/" target="_blank">Istio</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/quarkus-tutorial/" target="_blank">Quarkus</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/knative-tutorial/" target="_blank">Knative</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/tekton-tutorial/" target="_blank">Tekton</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="k8s-start-guides" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html"></a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-the-openshift-platform.html">1. Introduction</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#02-accessing-the-cluster">Accessing the cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#minikube">Setup Minikube</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#package">Build Service</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#deploy">Deploy Dervice</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/17-persistent-volumes.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="paragraph">
+<p>One of the resources associated with the database was a persistent volume. We also need a persistent volume for the front end web application. This is required because although the blog post content is stored in the database, any image attached to the post is stored in the file system. As the container file system is ephemeral, the images would be lost when a <code>pod</code> is killed. The container file system is also not shared between the multiple instances of the application.</p>
+</div>
+<div class="paragraph">
+<p>To add persistent storage to an application, the first step is that you need to create a persistent volume claim. This tells Kubernetes that you need storage, how big the volume needs to be and what type of storage is required.</p>
+</div>
+<div class="paragraph">
+<p>The resource definition for the persistent volume claim we need to use can be seen by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v5/persistentvolumeclaim.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see that it contains:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blog-media
+  labels:
+    app: blog
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This says that the storage should be at least of size 1Gi and that the access mode should be <code>ReadWriteMany</code>.</p>
+</div>
+<div class="paragraph">
+<p>Kubernetes supports three different access modes for storage.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ReadWriteOnce</code> (RWO) - The volume can be mounted as read/write by a single node.</p>
+</li>
+<li>
+<p><code>ReadOnlyMany</code> (ROX) - The volume can be mounted as read-only by many nodes.</p>
+</li>
+<li>
+<p><code>ReadWriteMany</code> (RWX) - The volume can be mounted as read/write by many nodes.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>What access modes for storage are available will depend on the Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>For the front end web application we are using, because we want to be able to run multiple instances, we need storage with an access mode that allows it to be mounted on multiple nodes in the Kubernetes cluster. This is because instances of the application could run on different nodes. This is why <code>ReadWriteMany</code> is requested.</p>
+</div>
+<div class="paragraph">
+<p>In contrast, the database will only ever have one instance and so storage with access mode <code>ReadWriteOnce</code> is sufficient.</p>
+</div>
+<div class="paragraph">
+<p>In addition to creating the persistent volume claim, the <code>deployment</code> needs to be updated.</p>
+</div>
+<div class="paragraph">
+<p>At <code>spec.template.spec.volumes</code> in the <code>deployment</code> we need to add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">      volumes:
+      - name: media
+        persistentVolumeClaim:
+          claimName: blog-media</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This indicates the persistent volume claim is to be used.</p>
+</div>
+<div class="paragraph">
+<p>At <code>spec.template.spec.containers.volumeMounts</code>, we neeed to add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">        volumeMounts:
+        - name: media
+          mountPath: "/opt/app-root/src/media"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This indicates that the persistent volume should be mounted at the path <code>/opt/app-root/src/media</code> in the container.</p>
+</div>
+<div class="paragraph">
+<p>To see the updated <code>deployment</code> configuration run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v5/deployment.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To apply the configuration changes run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v5/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog configured
+ingress.extensions/blog unchanged
+persistentvolumeclaim/blog-media created
+service/blog unchanged</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both components of the application, the database and the front end web application are fully deployed once again.</p>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

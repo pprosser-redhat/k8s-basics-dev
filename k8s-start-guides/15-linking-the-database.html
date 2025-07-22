@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Kubernetees getting started workshop</title>
+    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/15-linking-the-database.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="https://pprosser-redhat.github.io/k8s-basics-dev">Kubernetees getting started workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://developers.redhat.com/ebooks/" target="_blank">Books</a>
+        <a class="navbar-item" href="https://developers.redhat.com/cheatsheets/" target="_blank">Cheat Sheets</a>
+        <a class="navbar-item" href="https://developers.redhat.com/events/" target="_blank">Upcoming Events</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/kubernetes-tutorial/" target="_blank">Kubernetes</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/istio-tutorial/" target="_blank">Istio</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/quarkus-tutorial/" target="_blank">Quarkus</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/knative-tutorial/" target="_blank">Knative</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/tekton-tutorial/" target="_blank">Tekton</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="k8s-start-guides" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html"></a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-the-openshift-platform.html">1. Introduction</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#02-accessing-the-cluster">Accessing the cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#minikube">Setup Minikube</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#package">Build Service</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#deploy">Deploy Dervice</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/15-linking-the-database.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="paragraph">
+<p>The front end web application is running and is accessible to the public internet. At this point it is using a file based SQLite database which has been pre-populated with some posts. This database is local to each instance, not shared between all (making it unsuited to a scaled application), and any changes to data will be lost whenever the <code>pod</code> restarts.</p>
+</div>
+<div class="paragraph">
+<p>To provide persistence for data, and have all instances of the application using the same database, we will configure the front end web application to use the separate Postgresql database which is already running.</p>
+</div>
+<div class="paragraph">
+<p>To view the resources for the database, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get deployment,service,pvc,secret -l app=blog-db -o name</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should yield:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.extensions/blog-db
+service/blog-db
+persistentvolumeclaim/blog-database
+secret/blog-credentials</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should understand now the purpose of <code>deployment</code> and <code>service</code>. The <code>persistentvolumeclaim</code> is used to claim persistent storage for use by the database. The <code>secret</code> is used to hold the credentials for the database.</p>
+</div>
+<div class="paragraph">
+<p>In order to link the database to the front end web application, we need to tell the front end web application the name of the host for the database, and what the login credentials are. To do this we need to add environment variable settings to the <code>deployment</code> for the front end web application.</p>
+</div>
+<div class="paragraph">
+<p>You can see what environment variables are already set for the front end web application by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl set env deployment/blog --list</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should display:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># Deployment blog, container blog
+BLOG_SITE_NAME=OpenShift Blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The way that the front end web application is implemented, it is expecting the following environment variables for a separate database.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>DATABASE_HOST</code> - The host name of the database.</p>
+</li>
+<li>
+<p><code>DATABASE_USER</code> - The user to login into the database.</p>
+</li>
+<li>
+<p><code>DATABASE_PASSWORD</code> - The password of the user for the database.</p>
+</li>
+<li>
+<p><code>DATABASE_NAME</code> - The name of the database.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To set environment variables, <code>kubectl</code> provides the command <code>kubectl set env</code>. We don&#8217;t want to update the live configuration, but keep the configuration locally, but we can use it to work out the changes we need to make to that configuration.</p>
+</div>
+<div class="paragraph">
+<p>For the database host, the host name will be the name of the database <code>service</code> object, which is <code>blog-db</code>.</p>
+</div>
+<div class="paragraph">
+<p>To see what the <code>deployment</code> configuration would look like with that set, we can run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl set env deployment/blog DATABASE_HOST=blog-db --dry-run -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the output, you can see that along side the existing <code>BLOG_SITE_NAME</code> environment variable, you now have the <code>DATABASE_HOST</code> environment variable. This is under the <code>spec.template.spec.containers.env</code> setting.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">    spec:
+      containers:
+      - env:
+        - name: BLOG_SITE_NAME
+          value: OpenShift Blog
+        - name: DATABASE_HOST
+          value: blog-db</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The database credentials could be added in a similar way, but for this application we already have those stored in the <code>secret</code> for the database. You can view the <code>secret</code> called <code>blog-credentials</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get secret/blog-credentials -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Within the output you will see the <code>data</code> section holding values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">data:
+  database-name: YmxvZw==
+  database-password: dG9wLXNlY3JldA==
+  database-user: YmxvZw==</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What you see aren&#8217;t the actual values as they have been obfuscated using base64 encoding.</p>
+</div>
+<div class="paragraph">
+<p>In order to use the same values, but not actually have to copy them, you can configure the <code>deployment</code> to inject the environment variables from the secret. To see how the configuration should look for this you can run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl set env deployment/blog --from secret/blog-credentials --dry-run -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For these, the <code>spec.template.spec.containers.env</code> setting would need to be updated to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">    spec:
+      containers:
+      - env:
+        - name: BLOG_SITE_NAME
+          value: OpenShift Blog
+        - name: DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              key: database-name
+              name: blog-credentials
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-password
+              name: blog-credentials
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              key: database-user
+              name: blog-credentials</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Combining all of these we get:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v4/deployment.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To apply this configuration run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v4/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The database and the front end web application are now linked, but some extra steps are required to initalise the database.</p>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Kubernetees getting started workshop</title>
+    <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/07-deployment-resource.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="https://pprosser-redhat.github.io/k8s-basics-dev">Kubernetees getting started workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://developers.redhat.com/ebooks/" target="_blank">Books</a>
+        <a class="navbar-item" href="https://developers.redhat.com/cheatsheets/" target="_blank">Cheat Sheets</a>
+        <a class="navbar-item" href="https://developers.redhat.com/events/" target="_blank">Upcoming Events</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/kubernetes-tutorial/" target="_blank">Kubernetes</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/istio-tutorial/" target="_blank">Istio</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/quarkus-tutorial/" target="_blank">Quarkus</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/knative-tutorial/" target="_blank">Knative</a>
+            <a class="navbar-item" href="https://redhat-developer-demos.github.io/tekton-tutorial/" target="_blank">Tekton</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="k8s-start-guides" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html"></a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-the-openshift-platform.html">1. Introduction</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#02-accessing-the-cluster">Accessing the cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#minikube">Setup Minikube</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#package">Build Service</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deploy.html#deploy">Deploy Dervice</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/pprosser-redhat/k8s-basics-dev/edit/master/documentation/modules/ROOT/pages/07-deployment-resource.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="paragraph">
+<p>As already highlighted, a key resource created when deploying an application is the <code>deployment</code> resource. It specifies the name of the container image to be deployed for an application, how many instances should be started, and the strategy for how the deployment should be managed.</p>
+</div>
+<div class="paragraph">
+<p>To view the <code>deployment</code> resource used for the front end web application, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend/deployment.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This has various parts to it, as well as dependencies on other resources, so let&#8217;s start over and create this from scratch.</p>
+</div>
+<div class="paragraph">
+<p>To create a new <code>deployment</code> resource what often happens is that a developer will copy an existing one, be it one from an existing application, or a sample provided in documentation or a blog post.</p>
+</div>
+<div class="paragraph">
+<p>An alternative is to have <code>kubectl</code> create it for you. For a <code>deployment</code>, the <code>kubectl</code> command provides two options for creating the resource definition for you.</p>
+</div>
+<div class="paragraph">
+<p>The first option is using the <code>kubectl create deployment</code> command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl create deployment --help</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the deployment of the front end web application, the container image we want to use is <code>openshiftkatacoda/blog-django-py:latest</code>.</p>
+</div>
+<div class="paragraph">
+<p>To see what <code>kubectl create deployment</code> would create for us run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl create deployment blog --image openshiftkatacoda/blog-django-py:latest --dry-run -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should yield:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blog
+  name: blog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blog
+    spec:
+      containers:
+      - image: openshiftkatacoda/blog-django-py:latest
+        name: blog-django-py
+        resources: {}
+status: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that nothing has been created at this point as when we ran <code>kubectl create deployment</code> we used the <code>--dry-run</code> option, it therefore only showed what it would create.</p>
+</div>
+<div class="paragraph">
+<p>Although <code>kubectl create deployment</code> could be used, it is a very bare bones skeleton for a <code>deployment</code> object.</p>
+</div>
+<div class="paragraph">
+<p>A second option is to use <code>kubectl run</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl run --help</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command accepts numerous options for helping you fill out the resource definition with additional key configuration you might need.</p>
+</div>
+<div class="paragraph">
+<p>To start to replicate the configuration for our sample application, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl run blog --image openshiftkatacoda/blog-django-py:latest --labels app=blog --replicas 2 --port 8080 --env BLOG_SITE_NAME="OpenShift Blog" --dry-run -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should produce:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blog
+  name: blog
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blog
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blog
+    spec:
+      containers:
+      - env:
+        - name: BLOG_SITE_NAME
+          value: OpenShift Blog
+        image: openshiftkatacoda/blog-django-py:latest
+        name: blog
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The difference is that it has set the number of replicas of our application that we want to be 2 instead of 1. It includes the port number our application listens on, and includes one of the environment variables we want to be set. We have also ensured the label used is <code>app=blog</code>. This version of the <code>deployment</code> is still far from complete, but it is enough to get us started.</p>
+</div>
+<div class="paragraph">
+<p>One could now re-run the command and leave off the <code>--dry-run</code> option and it would create the resource. To make subsequent changes to the resource definition, one could then edit it in place using the <code>kubectl edit</code> command.</p>
+</div>
+<div class="paragraph">
+<p>Maintaining the master copy of the configuration in Kubernetes like this is fine in a development environment, but for production, it is better to keep the master copy as a local file, under revision control so you can track it, and when changes are needed, edit the local master copy and apply it to the Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>The Kubernetes documentation has a discussion about these two different approaches to managing configuration in [Managing Kubernetes Objects Using Imperative Commands](<a href="https://kubernetes.io/docs/concepts/overview/object-management-kubectl/imperative-command/" class="bare">https://kubernetes.io/docs/concepts/overview/object-management-kubectl/imperative-command/</a>) and [Declarative Management of Kubernetes Objects Using Configuration Files](<a href="https://kubernetes.io/docs/concepts/overview/object-management-kubectl/declarative-config/" class="bare">https://kubernetes.io/docs/concepts/overview/object-management-kubectl/declarative-config/</a>).</p>
+</div>
+<div class="paragraph">
+<p>As it is closer to what you would want to do for a production environment, we will use the latter approach.</p>
+</div>
+<div class="paragraph">
+<p>For this first attempt towards replicating the front end web application, the output from <code>kubectl run</code> has been captured in the file <code>frontend-v1/deployment.yaml</code>. You can see the full contents of the directory by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">ls -las frontend-v1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As is, it is only the one file. We could at this point run <code>kubectl apply</code> on just this file, but as we go along we will be adding additional files for other resources. We will therefore continue to use the ability of <code>kubectl apply</code> to be given a directory of files to process and apply them in one operation.</p>
+</div>
+<div class="paragraph">
+<p>Create the <code>deployment</code> by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v1/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It should output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog created</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Monitor progress of the deployment so you know when it has completed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl rollout status deployment/blog</code></pre>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
