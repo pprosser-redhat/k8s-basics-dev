@@ -1,5 +1,5 @@
-* xref:01-setup.adoc[1. Setup]
-** xref:01-setup.adoc#prerequisite[Prerequisites]
+* xref:01-the-openshift-platform.adoc[1. Introduction]
+** xref:02-accessing-the-cluster[Accessing the cluster]
 ** xref:01-setup.adoc#minikube[Setup Minikube]
 
 * xref:02-deploy.adoc[2. Deploy Service]
