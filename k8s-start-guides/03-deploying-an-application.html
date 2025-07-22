@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Untitled :: Kubernetees getting started workshop</title>
+    <title>Untitled :: Kubernetes getting started workshop</title>
     <link rel="canonical" href="https://pprosser-redhat.github.io/k8s-basics-dev/k8s-start-guides/03-deploying-an-application.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
@@ -13,7 +13,7 @@
   <nav class="navbar">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
-      <a class="navbar-item" style="font-size: 24px; color: white" href="https://pprosser-redhat.github.io/k8s-basics-dev">Kubernetees getting started workshop</a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="https://pprosser-redhat.github.io/k8s-basics-dev">Kubernetes getting started workshop</a>
       <button class="navbar-burger" data-target="topbar-nav">
         <span></span>
         <span></span>
@@ -128,7 +128,7 @@ deployment.apps/blog-db created (dry run)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>kubectl apply</code> command in this case is what is used to create resources from a configuration file, or set of files contained in a directory. We used the <code>--dry-run</code> option, which says to tell us what would be created, but don&#8217;t actually do it. The <code>--dry-run</code> option is useful because it will tell you what resources would be created, but also validates the resource definitions and will warn you if you have errors in them.</p>
+<p>The <code>kubectl apply</code> command in this case is what is used to create resources from a configuration file, or set of files contained in a directory. We used the <code>--dry-run=client</code> option, which says to tell us what would be created, but don&#8217;t actually do it. The <code>--dry-run=client</code> option is useful because it will tell you what resources would be created, but also validates the resource definitions and will warn you if you have errors in them.</p>
 </div>
 <div class="paragraph">
 <p>If you are ever uncertain about what a command does, or what options it accepts, you can run it with the <code>--help</code> option.</p>
