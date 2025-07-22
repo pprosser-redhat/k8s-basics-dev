@@ -1,8 +1,9 @@
-* xref:01-the-openshift-platform.adoc[1. Introduction]
+* Getting Started
+** xref:01-the-openshift-platform.adoc[Introduction]
 ** xref:02-accessing-the-cluster.adoc[Accessing the cluster]
 
 ** xref:01-setup.adoc#minikube[Setup Minikube]
 
-* xref:02-deploy.adoc[2. Deploy Service]
-** xref:02-deploy.adoc#package[Build Service]
-** xref:02-deploy.adoc#deploy[Deploy Dervice]
+* Deploying the Application
+** xref:03-deploying-an-application.adoc[Deploy the Application]
+** xref:04-creating-the-resources.adoc[Create the Resources]
