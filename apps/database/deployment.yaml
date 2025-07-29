@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mongodb-community-server
+  labels:
+    app: workshop
+    app.kubernetes.io/part-of: workshop
+    app.kubernetes.io/instance: mongodb-community-server
+    app.kubernetes.io/component: mongodb-community-server
+    app.openshift.io/runtime: mongodb
+    role: database
+    app.kubernetes.io/name: mongodb-community-server
+    component: mongodb-community-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-community-server
+  template:
+    metadata:
+      labels:
+        app: mongodb-community-server
+        component: mongodb-community-server
+        deployment: mongodb-community-server
+        role: database
+    spec:
+      volumes:
+        - name: mongodb-community-server-1
+          emptyDir: {}
+        - name: mongodb-community-server-2
+          emptyDir: {}
+        - name: national-parks-database
+          persistentVolumeClaim:
+            claimName: national-parks-database
+      containers:
+        - name: mongodb-community-server
+          image: 'quay.io/mongodb/mongodb-community-server:latest'
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - name: mongodb-community-server-1
+              mountPath: /data/configdb
+            - name: mongodb-community-server-2
+              mountPath: /data/db
+            - name: national-parks-database
+              mountPath: /data
+          imagePullPolicy: Always

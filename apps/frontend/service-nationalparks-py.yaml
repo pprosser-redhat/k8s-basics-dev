@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nationalparks-py
+  labels:
+    app: workshop
+    app.kubernetes.io/part-of: workshop
+    app.kubernetes.io/instance: nationalparks-py
+    app.kubernetes.io/component: nationalparks-py
+    role: backend
+    app.kubernetes.io/name: nationalparks-py
+    type: parksmap-backend
+    component: nationparks
+  annotations:
+    type: parksmap-backend
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: nationalparks-py
+    deployment: nationalparks-py

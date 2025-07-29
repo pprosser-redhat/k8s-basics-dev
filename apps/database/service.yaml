@@ -1,0 +1,30 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongodb-community-server
+  namespace: user1-workshop
+  labels:
+    app: workshop
+    app.kubernetes.io/component: mongodb-community-server
+    app.kubernetes.io/instance: mongodb-community-server
+    app.kubernetes.io/name: mongodb-community-server
+    app.kubernetes.io/part-of: workshop
+    app.openshift.io/runtime-version: 7.0.15-ubi9
+    component: mongodb-community-server
+    role: database
+spec:
+  clusterIP: 172.31.161.17
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 27017-tcp
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: mongodb-community-server
+    deployment: mongodb-community-server

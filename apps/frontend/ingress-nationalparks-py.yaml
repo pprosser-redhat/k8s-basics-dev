@@ -1,0 +1,20 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: nationalparks-py
+  labels:
+    app: workshop
+spec:
+  rules:
+    - host: nationalparks-user1-workshop.apps.cluster-5cbfd.dynamic.redhatworkshops.io
+#   - host: nationalparks-${PROJECT_NAMESPACE}.${CLUSTER_SUBDOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nationalparks-py
+                port:
+                  number: 8080
+

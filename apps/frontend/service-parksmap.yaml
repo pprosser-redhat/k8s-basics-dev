@@ -1,0 +1,23 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: parksmap
+  labels:
+    app: workshop
+    app.kubernetes.io/component: parksmap
+    app.kubernetes.io/instance: parksmap
+    app.kubernetes.io/name: parksmap
+    app.kubernetes.io/part-of: workshop
+    app.openshift.io/runtime-version: latest
+    component: parksmap
+    role: frontend
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: parksmap
+    deployment: parksmap

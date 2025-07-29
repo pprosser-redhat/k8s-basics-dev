@@ -1,0 +1,19 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: parksmap
+  labels:
+    app: workshop
+spec:
+  rules:
+    - host: parksmap-user1-workshop.apps.cluster-5cbfd.dynamic.redhatworkshops.io
+#   - host: parksmap-${PROJECT_NAMESPACE}.${CLUSTER_SUBDOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: parksmap
+                port:
+                  number: 8080
