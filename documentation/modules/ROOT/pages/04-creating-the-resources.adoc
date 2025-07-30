@@ -1,55 +1,156 @@
 By doing a dry run deployment, you have seen the resources that will be created. To actually deploy the database component, now run:
 
-```execute
+[.console-input]
+[source,execute]
+----
 kubectl apply -f database/
-```
+----
 
 As with the dry run, `kubectl apply` will list the resources, except this time the resources will be created.
 
-```
+[.console-output]
+[source]
+----
 secret/blog-credentials created
 service/blog-db created
 persistentvolumeclaim/blog-database created
 deployment.apps/blog-db created
-```
+----
 
 The key resource in this list is `deployment`. It specifies the name of the container image to be deployed for an application, how many instances should be started, and the strategy for how the deployment should be managed.
 
 To monitor progress of the deployment, and know when it has completed, you can run the command:
 
 ```execute
-kubectl rollout status deployment/blog-db
+kubectl rollout  status deployment/mongodb-community-server
 ```
 
 The argument is the full name of the resource, including the type of resource and the name for this instance. In this case the instance was called `blog-db`.
 
 With the database deployed, now deploy the front end web application by running:
 
-```execute
+[.console-input]
+[source,execute]
+----
 kubectl apply -f frontend/
-```
+----
 
 This should output:
 
-```
-persistentvolumeclaim/blog-media created
-deployment.apps/blog created
-service/blog created
-ingress.extensions/blog created
-```
+[.console-output]
+[source]
+----
+deployment.apps/parksmap created
+ingress.networking.k8s.io/parksmap created
+rolebinding.rbac.authorization.k8s.io/parksmap-view created
+service/parksmap created
+----
 
 Run:
 
-```execute
-kubectl rollout status deployment/blog
-```
+[.console-input]
+[source,execute]
+----
+kubectl rollout status deployment/parksmap
+----
 
 to monitor and wait for it to be deployed.
 
 In the resources created for the front end web application, the `ingress` is special, in that it is what sets up access to our web application using a public URL.
 
-In this example, the URL for accessing the web application will be:
+In this example, the URL for accessing the front end web application will be:
 
-http://blog-%project_namespace%.%cluster_subdomain%
+You need to substitute the `PROJECT_NAMESPACE` and `CLUSTER_SUBDOMAIN` variables with your own values.
 
-Visit the front end web application by clicking on this link. There will not be any blog posts displayed as yet. We will get to setting up and populating the database later.
+http://parksmap-%project_namespace%.%cluster_subdomain%
+
+This is easy to findout by running a query againts the parksmap ingress using `kubectl`:
+[.console-input]
+[source,execute]
+----
+kubectl get ingress parksmap -o=jsonpath='{.spec.rules[0]}' | jq
+----
+
+This should output something like this:
+[.console-output]
+[source]
+----
+{
+  "host": "parksmap-user1-workshop.apps.cluster-5cbfd.dynamic.redhatworkshops.io",
+  "http": {
+    "paths": [
+      {
+        "backend": {
+          "service": {
+            "name": "parksmap",
+            "port": {
+              "number": 8080
+            }
+          }
+        },
+        "path": "/",
+        "pathType": "Prefix"
+      }
+    ]
+  }
+}
+----
+
+The value of host is what you are after.
+
+Visit the front end web application by typing (or copying).
+
+[.console-input]
+[source,execute]
+----
+http://parksmap-user1-workshop.apps.cluster-5cbfd.dynamic.redhatworkshops.io
+----
+
+into your browser (`Please make sure you use the host name from your cluster`)
+
+    There will not be any national parks displayed as yet. We still have to deploy the backend application, which is what we'll do next.
+
+With the front end web application deployed, now deploy the backend application by running:
+
+[.console-input]
+[source,execute]
+----
+kubectl apply -f ./backend/
+----
+
+This should output:
+
+[.console-output]
+[source]
+----
+deployment.apps/nationalparks-py created
+ingress.networking.k8s.io/nationalparks-py created
+service/nationalparks-py created
+----
+
+Now visit the front end web application again, and you'll notice that there are still no national parks displayed. This is because there is no data in the database yet. 
+
+Fortunately, the backend application has an API that we can use to load the data. Later, we'll look at how logging might have helped us work this out.
+
+To load the data into the database, run:
+
+[.console-input]
+[source,execute]
+----
+curl http://nationalparks-py:8080/ws/data/load
+----
+
+This should output:
+
+[.console-output]
+[source]
+----
+"Items inserted in database: 2762"
+----
+
+As the terminal window is running in the same namespace as the nationalparks-py application on Kubernetes, it can access the kubernetes service directly hence no need for finding out the ingress host name to use (more later).
+
+Refresh the parksmap page in the `browser` and this time you should see national parks appearing on the map.
+
+Feel free to move around the map, zoom in and out, and click on national parks.
+

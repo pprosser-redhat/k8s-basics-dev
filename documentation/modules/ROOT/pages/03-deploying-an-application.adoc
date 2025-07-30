@@ -17,7 +17,7 @@ Rather than try and dig into each file to work out what it defines, you can have
 [.console-input]
 [source,execute]
 ----
-kubectl apply -f database/ --dry-run
+kubectl apply -f database/ --dry-run=client
 ----
 
 This should output:
