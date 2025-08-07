@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/13-service-networking.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>The <code>pod</code> corresponding to each instance of your application is ephemeral. If it dies it is not resurrected. The <code>replicaset</code> ensures that a <code>pod</code> that has died is replaced with a new instance, as well as ensuring the correct number of <code>pods</code> exist when scaling the number of replicas up or down. When a new <code>pod</code> is created, it will always have a new name.</p>
+</div>
+<div class="paragraph">
+<p>Each <code>pod</code>, as well as having a unique name, is also assigned it&#8217;s own IP address. You can see the IP addresses assigned to each <code>pod</code> by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get pods -l app=blog -o wide</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These IP addresses are only accessible within the Kubernetes cluster. Depending on the Kubernetes networking configuration, they may only be accessible from applications running in the same namespace.</p>
+</div>
+<div class="paragraph">
+<p>Like with the names of <code>pods</code>, the IP addresses in use for an application will not stay the same over time. When a <code>pod</code> dies and is replaced, it can receive a completely different IP address. IP addresses cannot be relied upon for communicating between components in an application.</p>
+</div>
+<div class="paragraph">
+<p>To add a stable IP address and hostname for an application, a <code>service</code> resource needs to be created. The IP address of a <code>service</code> will map to the set of <code>pods</code> which make up your application, with traffic to the IP address of the service being load balanced across the <code>pods</code>.</p>
+</div>
+<div class="paragraph">
+<p>As with creating a <code>deployment</code>, the <code>kubectl</code> program provides convenience methods for creating a <code>service</code>. These are <code>kubectl expose</code> and <code>kubectl create service</code>. We will skip these and use the resource definition. Run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v2/service.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to see the <code>service</code> definition. You should see:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: v1
+kind: Service
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  type: ClusterIP
+  selector:
+    app: blog
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When used to create the resource object, this will result in a <code>service</code> named <code>blog</code> being created. The <code>ports</code> definition says that port 8080 will be exposed, with it mapping to port 8080 on the <code>pods</code>.</p>
+</div>
+<div class="paragraph">
+<p>Update the current application configuration by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v2/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog configured
+service/blog created</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As the <code>frontend-v2</code> directory also contains our original <code>deployment.yaml</code> file, this will also ensure that the current deployment is brought into line with what it defines.</p>
+</div>
+<div class="paragraph">
+<p>To review details of the <code>service</code> created run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get service --selector app=blog -o wide</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will display output similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">NAME      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE       SELECTOR
+blog      ClusterIP   172.30.70.193   &lt;none&gt;        8080/TCP   1m        app=blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can see that the service has it&#8217;s own IP address.</p>
+</div>
+<div class="paragraph">
+<p>Another application running in the same namespace can connect on this IP address and port 8080 to talk to the front end web application.</p>
+</div>
+<div class="paragraph">
+<p>The <code>service</code> will know what the corresponding <code>pods</code> are that traffic should be load balanced across by virtue of the label selector defined in the <code>service</code>. This is the <code>spec.selector</code> value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">  selector:
+    app: blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This means that the IP addresses for the <code>pods</code> resulting from a query of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get pods -l app=blog -o name</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>will be registered as endpoints against the <code>service</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can see the IP addresses of the <code>pods</code> registered against the <code>service</code> by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get endpoints blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Although the IP address will not change for the life of the <code>service</code> object, the IP should still not be used. Instead, a hostname corresponding to the <code>service</code> should be used. The hostname is the name of the <code>service</code>, is registered within an internal DNS in the Kubernetes cluster, and can be used by any application within the cluster.</p>
+</div>
+<div class="paragraph">
+<p>For an application running in the same namespace, an un-qualifed hostname can be used. In this case <code>blog</code> would be the hostname. If networking in the cluster is configured to allow access across namespaces, an application in a different namespace can use the name with subdomain matching the name of the namespace, and the further domain of <code>.svc</code>.</p>
+</div>
+<div class="paragraph">
+<p>For the front end web application you have deployed, the URL for accessing it would be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">http://blog.%project_namespace%.svc:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>%project_namespace%</code> is the subdomain added for the namespace.</p>
+</div>
+<div class="paragraph">
+<p>You can test it works by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">curl http://blog.%project_namespace%.svc:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that this still isn&#8217;t accessible outside of the Kubernetes cluster, extra steps are required to expose a <code>service</code> outside of the cluster. The <code>curl</code> command only works because the terminal you are using is running as a <code>pod</code> in the same Kubernetes cluster.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/05-querying-the-resources.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>The web console for a Kubernetes cluster can be used to display a visual representation, in your browser, of what resources have been created and the relationship between them,by way of a tease here is a screenshot of what it looks like:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/deployments-console.png" alt="Deployments" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>Most developers will interact with a Kubernetes cluster from the command line using <code>kubectl</code>.</p>
+</div>
+<div class="paragraph">
+<p>To see a list of all the deployments in the current namespace which have already been created, run:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get deployment</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should yield output:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+mongodb-community-server    1/1     1            1           15m
+nationalparks-py            1/1     1            1           9m2s
+parksmap                    2/2     2            2           14m
+workspace1dfffd9cfbe34c7d   1/1     1            1           20m</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The deployment starting with the name 'workspace' can be ignored. This deployment is hosting the web terminal window you are using.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To narrow in on a specific resource, the name of that resource can be added to the command:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get deployment/parksmap</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should then yield output for just the one resource.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+parksmap   2/2     2            2           15m</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The numbers you see might be different to those shown above
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To see much more detailed information about a resource <code>kubectl describe</code> can be used.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl describe deployment/parksmap</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For a deployment, just the start of what you should see is:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Name:                   parksmap
+Namespace:              user1-workshop
+CreationTimestamp:      Mon, 04 Aug 2025 15:48:16 +0000
+Labels:                 app=workshop
+                        app.kubernetes.io/component=parksmap
+                        app.kubernetes.io/instance=parksmap
+                        app.kubernetes.io/name=parksmap
+                        app.kubernetes.io/part-of=workshop
+                        app.openshift.io/runtime=rh-spring-boot
+                        component=parksmap
+                        role=frontend
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=parksmap
+Replicas:               2 desired | 2 updated | 2 total | 2 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+    ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is still in a semi human readable form and isn&#8217;t suitable for machine processing. To instead see the raw resource definition, you can use the <code>-o yaml</code> display output option to <code>kubectl get</code>.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get deployment/parksmap -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or if you prefer to work with JSON rather than YAML, you can use:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get deployment/parksmap  -o json</code></pre>
+</div>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

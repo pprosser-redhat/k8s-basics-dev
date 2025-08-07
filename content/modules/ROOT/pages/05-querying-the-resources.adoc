@@ -1,0 +1,99 @@
+The web console for a Kubernetes cluster can be used to display a visual representation, in your browser, of what resources have been created and the relationship between them,by way of a tease here is a screenshot of what it looks like:
+
+image::deployments-console.png[Deployments, 800]
+
+Most developers will interact with a Kubernetes cluster from the command line using `kubectl`.
+
+To see a list of all the deployments in the current namespace which have already been created, run:
+
+[.console-input]
+[source, execute]
+----
+kubectl get deployment
+----
+
+
+This should yield output:
+
+[.console-output]
+[source]
+----
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+mongodb-community-server    1/1     1            1           15m
+nationalparks-py            1/1     1            1           9m2s
+parksmap                    2/2     2            2           14m
+workspace1dfffd9cfbe34c7d   1/1     1            1           20m
+----
+
+NOTE: The deployment starting with the name 'workspace' can be ignored. This deployment is hosting the web terminal window you are using. 
+
+
+To narrow in on a specific resource, the name of that resource can be added to the command:
+
+
+[.console-input]
+[source, execute]
+----
+kubectl get deployment/parksmap
+----
+
+This should then yield output for just the one resource.
+
+[.console-input]
+[source, execute]
+----
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+parksmap   2/2     2            2           15m
+----
+
+NOTE: The numbers you see might be different to those shown above
+
+To see much more detailed information about a resource `kubectl describe` can be used.
+
+[.console-input]
+[source, execute]
+----
+kubectl describe deployment/parksmap
+----
+
+For a deployment, just the start of what you should see is:
+
+[.console-output]
+[source]
+----
+Name:                   parksmap
+Namespace:              user1-workshop
+CreationTimestamp:      Mon, 04 Aug 2025 15:48:16 +0000
+Labels:                 app=workshop
+                        app.kubernetes.io/component=parksmap
+                        app.kubernetes.io/instance=parksmap
+                        app.kubernetes.io/name=parksmap
+                        app.kubernetes.io/part-of=workshop
+                        app.openshift.io/runtime=rh-spring-boot
+                        component=parksmap
+                        role=frontend
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=parksmap
+Replicas:               2 desired | 2 updated | 2 total | 2 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+    ....
+----
+
+This is still in a semi human readable form and isn't suitable for machine processing. To instead see the raw resource definition, you can use the `-o yaml` display output option to `kubectl get`.
+
+[.console-input]
+[source, execute]
+----
+kubectl get deployment/parksmap -o yaml
+----
+
+Or if you prefer to work with JSON rather than YAML, you can use:
+
+[.console-input]
+[source, execute]
+----
+kubectl get deployment/parksmap  -o json
+----

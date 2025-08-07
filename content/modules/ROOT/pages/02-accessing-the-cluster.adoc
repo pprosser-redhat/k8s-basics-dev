@@ -1,0 +1,111 @@
+
+include::vars.adoc[]
+
+For the exercises you will be doing, you will be using the `kubectl` command line program to interact with Kubernetes. 
+
+The terminal window is provided for you via the interactive terminal session. It is accessible through the OpenShift Console cluster console URL. The URL will be made available to you once you have registered for a user. Don't worry, the lovely folks running the workshop will provide you with the instructions and URL's required to register during the introduction. You do not need to install anything on your own computer. You will be doing everything here through your web browser. 
+
+There is no need to login as you are already connected to the Kubernetes cluster you will be using.
+
+The workshop environment also provides you with a web based view into the Kubernetes cluster. This is available through the registration web app. This web based view uses the web interface which is included in OpenShift 4. This is included so you can visually see the results of what you do in the exercises if you want, but the exercises do not depend on it. The web interface provided here is different to the web interface that may be provided with other Kubernetes distributions.
+
+Testing cluster details 
+
+To access the OpenShift Console, navigate to the following URL in your browser and log in using the provided credentials:
+
+*Console URL:* link:{ocp4_starter_console_url}[{ocp4_starter_console_url},window='_blank']
+
+*Username:* `{user}`
+
+*Password:* `{ocp4_starter_password}`
+
+
+## Accessing the terminal window in the Kubernetes Cluster
+
+### Login to the cluster
+
+click on you `OpenShift cluster console` URL, and login using the credentials provided.
+
+One logged in, you should see a page similar to the one shown below:
+
+image::openshift-console.png[OpenShift Console, 1000]
+
+### Create a namespace and open the terminal window
+
+On the top right hand side of the console, you'll see the icon below:
+
+image::terminal-icon.png[Terminal, 40]
+
+Click on it
+
+You'll then see a page like this:
+
+image::configure-terminal.png[Configure Terminal, 900]
+
+In `Project name` enter:
+
+[.console-input]
+[source]
+----
+{your username}-workshop
+----
+
+If you need a reminder of your username, you'll find it on the registration web app.
+
+The page should look similar to the screen below (with your username in of course):
+
+image::terminal-configured.png[Configured Terminal, 900]
+
+and press `start`
+
+Finally, you shoud see your terminal window:
+
+image::terminal-window.png[Terminal Window, 900]
+
+If you want a bigger window to use, you can either:
+
+* move the hozizontal bar up, or
+* press the button in the top right hand corner of the terminal window to open a new tab
+
+NOTE: Most of the workshop will now take place in the terminal window. 
+
+### Clone the GIT repository required for the workshop
+
+The workshop materials are held in a publically available Github repository, you need to clone it. To do this, in the command window enter the following:
+
+[.console-input]
+[source, execute]
+----
+git clone https://github.com/pprosser-redhat/k8s-basics-dev.git
+----
+
+To be prepared to use the repositories workshop files, change directory to it:
+[.console-input]
+[source, execute]
+----
+cd k8s-basics-dev/apps
+----
+
+NOTE: After a certain amount of inactivity, the terminal will shutdown. That's fine as there is a button you press to restart the session if needed. However, the terminal is stateless, therefore you will need to perform the git clone again. 
+
+
+### Test kubectl
+Before continuing, verify that the `kubectl` command runs and the workshop environment is also functioning. To do this run:
+
+[.console-input]
+[source, execute]
+----
+kubectl version
+----
+
+Did you type the command in yourself? If you did, click on the command here instead and you will find that it is executed for you. You can click on any command here in the workshop notes which has the <span class="fas fa-play-circle"></span> icon shown to the right of it, and it will be copied to the interactive terminal and run for you.
+
+When run, you should see output similar to:
+
+[.console-output]
+[source]
+----
+Client Version: v1.31.1
+Kustomize Version: v5.4.2
+Server Version: v1.31.10
+----

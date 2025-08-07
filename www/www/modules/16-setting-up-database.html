@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/16-setting-up-database.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>For the front end web application being used, the database will be initialised if required when the application first starts up. What hasn&#8217;t yet been done is to setup an administrator password for the front end web application itself. You might also want to load in some initial data, such as some posts for our blog site.</p>
+</div>
+<div class="paragraph">
+<p>To do this we need to execute some commands within the running container for one of the instances of the front end web application.</p>
+</div>
+<div class="paragraph">
+<p>Grab the name of one of the <code>pods</code> which are running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">POD=`kubectl get pod -l app=blog -o template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | head -1` &amp;&amp; echo $POD</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and create an interactive terminal session.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl exec -it $POD bash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To setup an administrator password run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">powershift image setup</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will ensure that the database has been initialised and then prompt for the user information. Enter a user name for the administrator:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">admin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then an email address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">admin@example.com</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A password:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">mypassword</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and confirm the password:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">mypassword</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A final thing this setup script will do is also load some initial posts.</p>
+</div>
+<div class="paragraph">
+<p>Exit the interactive shell by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">exit</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should now be able to visit the blog site at:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://blog-%project_namespace%.%cluster_subdomain%" class="bare">http://blog-%project_namespace%.%cluster_subdomain%</a></p>
+</div>
+<div class="paragraph">
+<p>and see the posts.</p>
+</div>
+<div class="paragraph">
+<p>You can also click on the person icon top right of the page, and login with the credentials entered. This will allow you to enter additional posts.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

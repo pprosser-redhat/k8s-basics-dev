@@ -12,7 +12,6 @@ antora:
       solveButton: false
     - name: 03-deploying-an-application
       label: "Deploy the Application"
-      solveButton: false
 
 tabs:
   - name: ">_ terminal"

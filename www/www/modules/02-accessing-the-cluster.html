@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/02-accessing-the-cluster.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>For the exercises you will be doing, you will be using the <code>kubectl</code> command line program to interact with Kubernetes.</p>
+</div>
+<div class="paragraph">
+<p>The terminal window is provided for you via the interactive terminal session. It is accessible through the OpenShift Console cluster console URL. The URL will be made available to you once you have registered for a user. Don&#8217;t worry, the lovely folks running the workshop will provide you with the instructions and URL&#8217;s required to register during the introduction. You do not need to install anything on your own computer. You will be doing everything here through your web browser.</p>
+</div>
+<div class="paragraph">
+<p>There is no need to login as you are already connected to the Kubernetes cluster you will be using.</p>
+</div>
+<div class="paragraph">
+<p>The workshop environment also provides you with a web based view into the Kubernetes cluster. This is available through the registration web app. This web based view uses the web interface which is included in OpenShift 4. This is included so you can visually see the results of what you do in the exercises if you want, but the exercises do not depend on it. The web interface provided here is different to the web interface that may be provided with other Kubernetes distributions.</p>
+</div>
+<div class="paragraph">
+<p>Testing cluster details</p>
+</div>
+<div class="paragraph">
+<p>To access the OpenShift Console, navigate to the following URL in your browser and log in using the provided credentials:</p>
+</div>
+<div class="paragraph">
+<p><strong>Console URL:</strong> <a href="{openshift_console_url}" target="_blank" rel="noopener">{openshift_console_url}</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Username:</strong> <code>{user}</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Password:</strong> <code>{password}</code></p>
+</div>
+<div class="sect1">
+<h2 id="_accessing_the_terminal_window_in_the_kubernetes_cluster"><a class="anchor" href="#_accessing_the_terminal_window_in_the_kubernetes_cluster"></a>Accessing the terminal window in the Kubernetes Cluster</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_login_to_the_cluster"><a class="anchor" href="#_login_to_the_cluster"></a>Login to the cluster</h3>
+<div class="paragraph">
+<p>click on you <code>OpenShift cluster console</code> URL, and login using the credentials provided.</p>
+</div>
+<div class="paragraph">
+<p>One logged in, you should see a page similar to the one shown below:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/openshift-console.png" alt="OpenShift Console" width="1000">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_a_namespace_and_open_the_terminal_window"><a class="anchor" href="#_create_a_namespace_and_open_the_terminal_window"></a>Create a namespace and open the terminal window</h3>
+<div class="paragraph">
+<p>On the top right hand side of the console, you&#8217;ll see the icon below:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/terminal-icon.png" alt="Terminal" width="40">
+</div>
+</div>
+<div class="paragraph">
+<p>Click on it</p>
+</div>
+<div class="paragraph">
+<p>You&#8217;ll then see a page like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/configure-terminal.png" alt="Configure Terminal" width="900">
+</div>
+</div>
+<div class="paragraph">
+<p>In <code>Project name</code> enter:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{your username}-workshop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you need a reminder of your username, you&#8217;ll find it on the registration web app.</p>
+</div>
+<div class="paragraph">
+<p>The page should look similar to the screen below (with your username in of course):</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/terminal-configured.png" alt="Configured Terminal" width="900">
+</div>
+</div>
+<div class="paragraph">
+<p>and press <code>start</code></p>
+</div>
+<div class="paragraph">
+<p>Finally, you shoud see your terminal window:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/terminal-window.png" alt="Terminal Window" width="900">
+</div>
+</div>
+<div class="paragraph">
+<p>If you want a bigger window to use, you can either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>move the hozizontal bar up, or</p>
+</li>
+<li>
+<p>press the button in the top right hand corner of the terminal window to open a new tab</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Most of the workshop will now take place in the terminal window.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_clone_the_git_repository_required_for_the_workshop"><a class="anchor" href="#_clone_the_git_repository_required_for_the_workshop"></a>Clone the GIT repository required for the workshop</h3>
+<div class="paragraph">
+<p>The workshop materials are held in a publically available Github repository, you need to clone it. To do this, in the command window enter the following:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">git clone https://github.com/pprosser-redhat/k8s-basics-dev.git</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To be prepared to use the repositories workshop files, change directory to it:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cd k8s-basics-dev/apps</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+After a certain amount of inactivity, the terminal will shutdown. That&#8217;s fine as there is a button you press to restart the session if needed. However, the terminal is stateless, therefore you will need to perform the git clone again.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_test_kubectl"><a class="anchor" href="#_test_kubectl"></a>Test kubectl</h3>
+<div class="paragraph">
+<p>Before continuing, verify that the <code>kubectl</code> command runs and the workshop environment is also functioning. To do this run:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Did you type the command in yourself? If you did, click on the command here instead and you will find that it is executed for you. You can click on any command here in the workshop notes which has the &lt;span class="fas fa-play-circle"&gt;&lt;/span&gt; icon shown to the right of it, and it will be copied to the interactive terminal and run for you.</p>
+</div>
+<div class="paragraph">
+<p>When run, you should see output similar to:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Client Version: v1.31.1
+Kustomize Version: v5.4.2
+Server Version: v1.31.10</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/14-exposing-the-service.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>In order to expose a <code>service</code> so that it is accessible outside of the Kubernetes cluster, you need to create an <code>ingress</code> resource object.</p>
+</div>
+<div class="paragraph">
+<p>To see the definition for the <code>ingress</code> resource object we will use run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v3/ingress.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  rules:
+  - host: blog-%project_namespace%.%cluster_subdomain%
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: blog
+          servicePort: 8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>rules</code> section in the <code>ingress</code> definition is what controls what should happen when traffic for your web application is received by the router for the Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>In this case the rule says that any HTTP requests received for the host <code>blog-%project_namespace%.%cluster_subdomain%</code> should be directed to the application with <code>service</code> object named <code>blog</code>.</p>
+</div>
+<div class="paragraph">
+<p>When an external user accesses the host name from their web browser, they will use the standard port 80 for HTTP traffic, the router will pass through that traffic to port 8080 of the <code>service</code>.</p>
+</div>
+<div class="paragraph">
+<p>To update the configuration for the front end web application to add the <code>ingress</code> run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v3/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog configured
+ingress.extensions/blog created
+service/blog unchanged</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can review the <code>ingress</code> resource which was created by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get ingress -l app=blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that the <code>ingress</code> has been created, you can access the front end web application using a web browser at:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://blog-%project_namespace%.%cluster_subdomain%" class="bare">http://blog-%project_namespace%.%cluster_subdomain%</a></p>
+</div>
+<div class="paragraph">
+<p>Note that this works because a wildcard CNAME has already been pre-configured in an external domain name server (DNS) to direct traffic for this host to the router for the Kubernetes cluster. If this was your own Kubernetes cluster, you would need to configure an appropriate CNAME in the DNS for the host you want to use.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

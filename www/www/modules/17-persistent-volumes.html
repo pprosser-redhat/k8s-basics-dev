@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/17-persistent-volumes.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>One of the resources associated with the database was a persistent volume. We also need a persistent volume for the front end web application. This is required because although the blog post content is stored in the database, any image attached to the post is stored in the file system. As the container file system is ephemeral, the images would be lost when a <code>pod</code> is killed. The container file system is also not shared between the multiple instances of the application.</p>
+</div>
+<div class="paragraph">
+<p>To add persistent storage to an application, the first step is that you need to create a persistent volume claim. This tells Kubernetes that you need storage, how big the volume needs to be and what type of storage is required.</p>
+</div>
+<div class="paragraph">
+<p>The resource definition for the persistent volume claim we need to use can be seen by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v5/persistentvolumeclaim.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see that it contains:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blog-media
+  labels:
+    app: blog
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This says that the storage should be at least of size 1Gi and that the access mode should be <code>ReadWriteMany</code>.</p>
+</div>
+<div class="paragraph">
+<p>Kubernetes supports three different access modes for storage.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ReadWriteOnce</code> (RWO) - The volume can be mounted as read/write by a single node.</p>
+</li>
+<li>
+<p><code>ReadOnlyMany</code> (ROX) - The volume can be mounted as read-only by many nodes.</p>
+</li>
+<li>
+<p><code>ReadWriteMany</code> (RWX) - The volume can be mounted as read/write by many nodes.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>What access modes for storage are available will depend on the Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>For the front end web application we are using, because we want to be able to run multiple instances, we need storage with an access mode that allows it to be mounted on multiple nodes in the Kubernetes cluster. This is because instances of the application could run on different nodes. This is why <code>ReadWriteMany</code> is requested.</p>
+</div>
+<div class="paragraph">
+<p>In contrast, the database will only ever have one instance and so storage with access mode <code>ReadWriteOnce</code> is sufficient.</p>
+</div>
+<div class="paragraph">
+<p>In addition to creating the persistent volume claim, the <code>deployment</code> needs to be updated.</p>
+</div>
+<div class="paragraph">
+<p>At <code>spec.template.spec.volumes</code> in the <code>deployment</code> we need to add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">      volumes:
+      - name: media
+        persistentVolumeClaim:
+          claimName: blog-media</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This indicates the persistent volume claim is to be used.</p>
+</div>
+<div class="paragraph">
+<p>At <code>spec.template.spec.containers.volumeMounts</code>, we neeed to add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">        volumeMounts:
+        - name: media
+          mountPath: "/opt/app-root/src/media"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This indicates that the persistent volume should be mounted at the path <code>/opt/app-root/src/media</code> in the container.</p>
+</div>
+<div class="paragraph">
+<p>To see the updated <code>deployment</code> configuration run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">cat frontend-v5/deployment.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To apply the configuration changes run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl apply -f frontend-v5/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This should output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">deployment.apps/blog configured
+ingress.extensions/blog unchanged
+persistentvolumeclaim/blog-media created
+service/blog unchanged</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both components of the application, the database and the front end web application are fully deployed once again.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

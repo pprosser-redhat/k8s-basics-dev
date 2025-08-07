@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/10-pods-and-containers.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>It has already been mentioned that a <code>pod</code> represents an instance of your application.</p>
+</div>
+<div class="paragraph">
+<p>To be more precise, a <code>pod</code> is an abstraction which represents a group of running containers, where the containers are to be managed and scaled as a unit.</p>
+</div>
+<div class="paragraph">
+<p>An instance of your application runs in one container of each <code>pod</code> resulting from the deployment. Where there would only be multiple <code>pods</code> if the replica count on the <code>deployment</code> was greater than 1.</p>
+</div>
+<div class="paragraph">
+<p>In most cases a <code>pod</code> will consist of only a single container. There are use cases for running multiple containers in one <code>pod</code>, but they are generally the exception rather than the rule.</p>
+</div>
+<div class="paragraph">
+<p>Looking at the sample application being used in this workshop, there are two separate deployments. One for the front end web application, and the other for the database.</p>
+</div>
+<div class="paragraph">
+<p>They are separated as it allows the front end web application to be scaled up to multiple instances independent of the database. If both components had been created as part of the one deployment, running in separate containers of a <code>pod</code>, it would not be possible to scale the application up to multiple instances. This is because scaling a database isn&#8217;t as simple as increasing the replica count.</p>
+</div>
+<div class="paragraph">
+<p>The sequence of events which results in your application being run is therefore, that the <code>deployment</code> is created, from which a <code>replicaset</code> is created. From the <code>replicaset</code>, <code>pods</code> are created corresponding to the replica count specified in the <code>deployment</code>. For each <code>pod</code> created, a container is run using the container image supplied in the <code>deployment</code>. This is the instance of your application.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

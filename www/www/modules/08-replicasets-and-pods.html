@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled :: Kubernetes Basic Workshop</title>
+    <link rel="canonical" href="https://github.com/pprosser-redhat/k8s-basics-dev.git/modules/08-replicasets-and-pods.html">
+    <meta name="generator" content="Antora 3.1.12">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+
+</header>
+<div class="main-wrapper">
+
+  <main class="main">
+<div class="toolbar" role="navigation">
+</div><article class="doc">
+<div class="paragraph">
+<p>Having created the <code>deployment</code> run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get all -o name -l app=blog</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>all</code> value is not a resource type, but a short hand alias for the core Kubernetes resource types. It shows what we need here, but to be sure to get everything you want, you are usually better to list the resource types explicitly.</p>
+</div>
+<div class="paragraph">
+<p>The output should be similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">pod/blog-6b8999855c-6jjhj
+pod/blog-6b8999855c-zk8pg
+deployment.apps/blog
+replicaset.apps/blog-6b8999855c</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Although you only created the <code>deployment</code>, this has resulted in the creation of additional resources for <code>replicaset</code> and <code>pod</code>.</p>
+</div>
+<div class="paragraph">
+<p>This is because <code>deployment</code> acts as a template for the creation of a <code>replicaset</code>. A <code>replicaset</code> in turn acts as a template for the creation of the <code>pods</code>. It is the <code>pods</code> which represent the instances of your application. In this case, because the number of replicas has been set to 2, there are 2 pods.</p>
+</div>
+<div class="paragraph">
+<p>To view the resource definition for the <code>replicaset</code> run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get replicaset -l app=blog -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this you will see that the <code>spec</code> section contains:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: blog
+        pod-template-hash: "896156207"
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: blog
+          pod-template-hash: "896156207"
+      spec:
+        containers:
+        - env:
+          - name: BLOG_SITE_NAME
+            value: OpenShift Blog
+          image: openshiftkatacoda/blog-django-py:latest
+          imagePullPolicy: Always
+          name: blog
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This has been filled out with what was provided in the <code>spec</code> portion of the <code>deployment</code>.</p>
+</div>
+<div class="paragraph">
+<p>To view the resource definitions for the <code>pods</code> run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-execute hljs" data-lang="execute">kubectl get pod -l app=blog -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here the fields from <code>spec.template</code> of the <code>replicaset</code> have been used in creating the <code>pod</code> resource definition. The <code>spec.template</code> of a <code>deployment</code> and <code>replicaset</code> is what is referred to as the pod template.</p>
+</div>
+<div class="paragraph">
+<p>In both <code>replicaset</code> and <code>pod</code> you will see that a lot of additional fields have been added along the way. This is because they are being filled out with defaults for values which weren&#8217;t specified in the original <code>deployment</code>. The resource definitions also contain fields which help track the status of whatever the resource represents.</p>
+</div>
+<div class="paragraph">
+<p>In the case of the inherited defaults, these may be from the resource type, but also may be inherited in part from the global or namespace configuration. This is the case for the resource limits on CPU and memory, which have been inherited from limits set for the namespace you are working in.</p>
+</div>
+<div class="paragraph">
+<p>In any case, if these defaults turn out not to be correct and you need to change them, or you need to add additional settings, the change should be made in the <code>deployment</code>. You should not edit <code>replicaset</code> or <code>pod</code> directly yourself. Update the <code>deployment</code> instead. The instances of <code>replicaset</code> and <code>pod</code> will be correspondingly updated for you.</p>
+</div>
+<div class="paragraph">
+<p>When it comes to deleting an application, as we did previously for the front end web application, there is no need to explicitly delete either the <code>replicaset</code> or <code>pods</code>. This is because the <code>pods</code> are marked up as being owned by the <code>replicaset</code> they are created from, and the <code>replicaset</code> is marked as being owned by the <code>deployment</code>. When you delete the <code>deployment</code>, the <code>replicaset</code>, and the <code>pods</code> created from it, will be automatically deleted.</p>
+</div>
+</article>
+  </main>
+</div>
+<footer role="contentinfo">
+  <div class="region region-rhd-footer">
+    <div id="block-rhdfooter" class="rhd-footer">
+      <nav class="rhd-footer-nav" aria-label="Secondary Navigation" role="navigation">
+  <ul class="rhd-menu">
+    
+  </ul>
+</nav>
+    </div>
+  </div>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,3 +1,34 @@
+== To quickly install the workshop guide.
+
+=== git clone to showroom deploy project
+
+[source,shell]
+----
+git clone https://github.com/rhpds/showroom-deployer.git
+----
+
+change directory to the help chart
+
+[source,shell]
+----
+cd showroom-deployer/charts
+----
+
+run (change the guid to yours, and change the deployer.domain to yours)
+
+[source,shell]
+----
+helm template basic-k8s-dev ./zerotouch \
+--set deployer.domain=apps.cluster-rpqnl.dynamic.redhatworkshops.io \ 
+--set guid=rpqnl \
+--set content.repoUrl=https://github.com/pprosser-redhat/k8s-basics-dev.git \ 
+--debug --create-namespace=true \
+--set namespace.create=true \
+--namespace=workshop | \
+oc apply -f -
+----
+
+
 === Getting Started
 
 * Create a git repo from this template
