@@ -2,7 +2,7 @@
 site:
   title: "Kubernetes Basic Workshop"
   url: https://github.com/pprosser-redhat/k8s-basics-dev.git
-  start_page: modules::01-the-openshift-platform
+  start_page: modules::01-the-openshift-platform.adoc
 
 asciidoc:
   attributes:
