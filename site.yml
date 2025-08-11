@@ -2,14 +2,7 @@
 site:
   title: "Kubernetes Basic Workshop"
   url: https://github.com/rhpds/showroom_template_zero
-  start_page: modules::01-the-openshift-platform
-
-asciidoc:
-  attributes:
-    lab_name: "I'm the lab_name var"
-    release-version: main
-    page-pagination: true
-    my_var: "foo - this is an asciidoc attribute from `site.yml`"
+  start_page: 01-the-openshift-platform.adoc
 
 content:
   sources:

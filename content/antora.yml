@@ -2,3 +2,9 @@
 
 name: modules
 version: main
+
+asciidoc:
+  attributes:
+    lab_name: "Kubernetes Basic Workshop"
+    release-version: master
+    page-pagination: true
